@@ -35,6 +35,15 @@ app.post("/add", function (req, res) {
       { _id: totalPost + 1, 제목: req.body.title, 날짜: req.body.date },
       () => {
         console.log("저장완료");
+        db.collection("counter").updateOne(
+          { name: "게시물갯수" },
+          { $inc: { totalPost: 1 } },
+          (err, data) => {
+            if (err) {
+              return console.log(err);
+            }
+          }
+        );
       }
     );
   });
