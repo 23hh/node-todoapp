@@ -62,14 +62,14 @@
 
         $('.delete').click((e) => {
             let postId = e.target.dataset.id
-            console.log(postId)
+            let target = $(e.target)
 
             $.ajax({
                 method: 'DELETE',
                 url: '/delete',
                 data: { _id: postId }
-            }).done(function (결과) {
-                //AJAX 성공시 실행할 코드는 여기
+            }).done((data) => {
+                target.parent('li').fadeOut();
             })
         });
 
