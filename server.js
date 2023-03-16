@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 const MongoClient = require("mongodb").MongoClient;
+app.set("view engine", "ejs");
 
 var db;
 MongoClient.connect(
@@ -27,10 +28,23 @@ app.get("/write", (req, res) => {
 
 app.post("/add", function (req, res) {
   res.send("전송완료");
-  db.collection("post").insertOne(
-    { 제목: req.body.title, 날짜: req.body.date },
-    function () {
-      console.log("저장완료");
-    }
-  );
+  db.collection("counter").findOne({ name: "게시물갯수" }, (err, data) => {
+    console.log(data.totalPost);
+    let totalPost = data.totalPost;
+    db.collection("post").insertOne(
+      { _id: totalPost + 1, 제목: req.body.title, 날짜: req.body.date },
+      () => {
+        console.log("저장완료");
+      }
+    );
+  });
+});
+
+app.get("/list", (req, res) => {
+  db.collection("post")
+    .find()
+    .toArray((err, data) => {
+      console.log(data);
+      res.render("list.ejs", { posts: data });
+    });
 });
