@@ -70,6 +70,8 @@
                 data: { _id: postId }
             }).done((data) => {
                 target.parent('li').fadeOut();
+            }).fail((xhr, textStatus, errorThrown) => {
+                console.log(xhr, textStatus, errorThrown)
             })
         });
 
