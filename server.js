@@ -29,8 +29,9 @@ app.get("/write", (req, res) => {
 app.post("/add", function (req, res) {
   res.send("전송완료");
   db.collection("counter").findOne({ name: "게시물갯수" }, (err, data) => {
-    console.log(data.totalPost);
+    console.log("test" + err);
     let totalPost = data.totalPost;
+
     db.collection("post").insertOne(
       { _id: totalPost + 1, 제목: req.body.title, 날짜: req.body.date },
       () => {
@@ -56,4 +57,12 @@ app.get("/list", (req, res) => {
       console.log(data);
       res.render("list.ejs", { posts: data });
     });
+});
+
+app.delete("/delete", (req, res) => {
+  req.body._id = parseInt(req.body._id);
+  db.collection("post").deleteOne(res.body, (err, data) => {
+    console.log("삭제완료");
+  });
+  res.send("삭제완료");
 });
