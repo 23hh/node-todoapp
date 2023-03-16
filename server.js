@@ -66,3 +66,13 @@ app.delete("/delete", (req, res) => {
   });
   res.status(200).send({ message: "성공" });
 });
+
+app.get("/detail/:id", (req, res) => {
+  db.collection("post").findOne(
+    { _id: parseInt(req.params.id) },
+    (err, data) => {
+      console.log(data);
+      res.render("detail.ejs", { data: data });
+    }
+  );
+});
