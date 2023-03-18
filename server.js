@@ -4,6 +4,8 @@ app.use(express.urlencoded({ extended: true }));
 const MongoClient = require("mongodb").MongoClient;
 app.set("view engine", "ejs");
 
+app.use("/public", express.static("public"));
+
 var db;
 MongoClient.connect(
   "mongodb+srv://lsh6166:test@cluster0.pgp2mwc.mongodb.net/todoapp?retryWrites=true&w=majority",
@@ -18,12 +20,12 @@ MongoClient.connect(
   }
 );
 
-app.get("/pet", function (req, res) {
-  res.send("펫용품 쇼핑할 수 있는 페이지");
+app.get("/", (req, res) => {
+  res.render("index.ejs");
 });
 
 app.get("/write", (req, res) => {
-  res.sendFile(__dirname + "/write.html");
+  res.render("write.ejs");
 });
 
 app.post("/add", function (req, res) {
