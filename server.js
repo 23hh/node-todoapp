@@ -101,3 +101,78 @@ app.put("/edit", (req, res) => {
     }
   );
 });
+
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const session = require("express-session");
+
+app.use(
+  session({ secret: "비밀코드", resave: true, saveUninitialized: false })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get("/login", (req, res) => {
+  res.render("login.ejs");
+});
+
+app.post(
+  "/login",
+  passport.authenticate("local", { failureRedirect: "/fail" }),
+  (req, res) => {
+    res.redirect("/");
+  }
+);
+
+app.get("/mypage", loginCheck, (req, res) => {
+  console.log(req.user);
+  res.render("mypage.ejs", { user: req.user });
+});
+
+function loginCheck(req, res, next) {
+  if (req.user) {
+    next();
+  } else {
+    res.send("login fail");
+  }
+}
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "id",
+      passwordField: "pw",
+      session: true,
+      passReqToCallback: false,
+    },
+    (입력한아이디, 입력한비번, done) => {
+      //console.log(입력한아이디, 입력한비번);
+      db.collection("login").findOne({ id: 입력한아이디 }, (err, data) => {
+        if (err) return done(err);
+
+        if (!data)
+          return done(null, false, { message: "존재하지않는 아이디요" });
+        if (입력한비번 == data.pw) {
+          return done(null, data);
+        } else {
+          return done(null, false, { message: "비번틀렸어요" });
+        }
+      });
+    }
+  )
+);
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+//로그인한 유저의 개인정보를 DB에서 찾는 역할
+passport.deserializeUser((아이디, done) => {
+  db.collection("login").findOne({ id: 아이디 }, (err, data) => {
+    done(null, data);
+  });
+});
+
+app.get("/fail", (req, res) => {
+  res.render("fail");
+});
