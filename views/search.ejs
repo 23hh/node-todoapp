@@ -66,9 +66,9 @@
             });
 
             $('#search').click(function () {
-                var 입력한값 = $('#search-input').val();
-                console.log(입력한값)
-                window.location.replace('/search?value=' + 입력한값)
+                let text = $('#search-input').val();
+                console.log(text)
+                window.location.replace('/search?value=' + text)
             });
 
         </script>

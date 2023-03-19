@@ -180,9 +180,23 @@ app.get("/fail", (req, res) => {
 
 //검색
 app.get("/search", (req, res) => {
+  let search = [
+    {
+      $search: {
+        index: "titleSearch",
+        text: {
+          query: req.query.value,
+          path: "제목", // 제목날짜 둘다 찾고 싶으면 ['제목', '날짜']
+        },
+      },
+    },
+    { $sort: { _id: 1 } },
+    { $limit: 10 },
+    { $project: { 제목: 1, 날짜: 1, score: { $meta: "searchScore" } } },
+  ];
   console.log(req.query);
   db.collection("post")
-    .find({ 제목: req.query.value })
+    .aggregate(search)
     .toArray((err, data) => {
       console.log(data);
       res.render("search.ejs", { posts: data });
