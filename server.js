@@ -3,6 +3,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 const MongoClient = require("mongodb").MongoClient;
 const methodOverride = require("method-override");
+require("dotenv").config();
 app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
 
@@ -10,13 +11,13 @@ app.use("/public", express.static("public"));
 
 var db;
 MongoClient.connect(
-  "mongodb+srv://lsh6166:test@cluster0.pgp2mwc.mongodb.net/todoapp?retryWrites=true&w=majority",
+  process.env.DB_URL,
   { useUnifiedTopology: true },
-  function (err, client) {
+  (err, client) => {
     if (err) return console.log(err);
     db = client.db("todoapp");
 
-    app.listen(8080, function () {
+    app.listen(process.env.PORT, () => {
       console.log("listening on 8080");
     });
   }
