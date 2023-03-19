@@ -24,7 +24,12 @@ MongoClient.connect(
 );
 
 app.get("/", (req, res) => {
-  res.render("index.ejs");
+  db.collection("post")
+    .find()
+    .toArray((err, data) => {
+      console.log(data);
+      res.render("index.ejs", { posts: data });
+    });
 });
 
 app.get("/write", (req, res) => {
@@ -32,7 +37,6 @@ app.get("/write", (req, res) => {
 });
 
 app.post("/add", function (req, res) {
-  res.send("전송완료");
   db.collection("counter").findOne({ name: "게시물갯수" }, (err, data) => {
     console.log("test" + err);
     let totalPost = data.totalPost;
@@ -52,6 +56,12 @@ app.post("/add", function (req, res) {
         );
       }
     );
+    db.collection("post")
+      .find()
+      .toArray((err, data) => {
+        console.log(data);
+        res.render("list.ejs", { posts: data });
+      });
   });
 });
 
@@ -77,7 +87,7 @@ app.get("/detail/:id", (req, res) => {
     { _id: parseInt(req.params.id) },
     (err, data) => {
       console.log(data);
-      res.render("detail.ejs", { data: data });
+      res.render("detail.ejs", { posts: data });
     }
   );
 });

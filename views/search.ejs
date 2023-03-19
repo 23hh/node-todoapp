@@ -65,7 +65,7 @@
                 })
             });
 
-            $('#search').click(function () {
+            $('#search').click(() => {
                 let text = $('#search-input').val();
                 console.log(text)
                 window.location.replace('/search?value=' + text)
