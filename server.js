@@ -177,3 +177,14 @@ passport.deserializeUser((아이디, done) => {
 app.get("/fail", (req, res) => {
   res.render("fail");
 });
+
+//검색
+app.get("/search", (req, res) => {
+  console.log(req.query);
+  db.collection("post")
+    .find({ 제목: req.query.value })
+    .toArray((err, data) => {
+      console.log(data);
+      res.render("search.ejs", { posts: data });
+    });
+});
