@@ -230,3 +230,28 @@ app.get("/search", (req, res) => {
       res.render("search.ejs", { posts: data });
     });
 });
+
+let multer = require("multer");
+let storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./public/image");
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+  filefilter: (req, file, cb) => {},
+});
+
+let upload = multer({ storage: storage });
+
+app.get("/upload", (req, res) => {
+  res.render("upload.ejs");
+});
+
+app.post("/upload", upload.single("profile"), (req, res) => {
+  res.send("업로드완료");
+});
+
+app.get("/image/:imageName", (req, res) => {
+  res.sendFile(__dirname + "/public/image/" + req.params.imageName);
+});
