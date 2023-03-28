@@ -3,6 +3,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 const MongoClient = require("mongodb").MongoClient;
 const methodOverride = require("method-override");
+const { ObjectId } = require("mongodb");
 require("dotenv").config();
 app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
@@ -254,4 +255,57 @@ app.post("/upload", upload.single("profile"), (req, res) => {
 
 app.get("/image/:imageName", (req, res) => {
   res.sendFile(__dirname + "/public/image/" + req.params.imageName);
+});
+
+app.post("/chatroom", loginCheck, (req, res) => {
+  let data = {
+    title: "chatTitle",
+    member: [ObjectId(req.body.chatUser), req.user._id],
+    data: new Date(),
+  };
+
+  db.collection("chatroom")
+    .insertOne(data)
+    .then((result) => {
+      res.send("성공");
+    });
+});
+
+app.get("/chat", loginCheck, (req, res) => {
+  db.collection("chatroom")
+    .find({ member: req.user._id })
+    .toArray()
+    .then((data) => {
+      res.render("chat.ejs", { data: data });
+    });
+});
+
+app.post("/message", loginCheck, (req, res) => {
+  let data = {
+    parent: req.body.parent,
+    content: req.body.content,
+    userId: req.user._id,
+    data: new Date(),
+  };
+
+  db.collection("message")
+    .insertOne(data)
+    .then(() => {
+      console.log("저장성공");
+    });
+});
+
+app.post("/message", loginCheck, function (req, res) {
+  var data = {
+    parent: req.body.parent,
+    userid: req.user._id,
+    content: req.body.content,
+    date: new Date(),
+  };
+  db.collection("message")
+    .insertOne(data)
+    .then((data) => {
+      console.log(parent);
+      res.send(data);
+    });
 });
