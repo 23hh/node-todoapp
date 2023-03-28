@@ -39,9 +39,6 @@
                 <div class="col-9 p-0">
                     <div class="chat-room">
                         <ul class="list-group chat-content">
-                            <li><span class="chat-box">채팅방1 내용</span></li>
-                            <li><span class="chat-box">채팅방1 내용</span></li>
-                            <li><span class="chat-box mine">채팅방1 내용</span></li>
                         </ul>
                         <div class="input-group">
                             <input class="form-control" id="chat-input">
@@ -55,6 +52,28 @@
 
         <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
         <script>
+            let targetChatId;
+            let eventSource;   //일단변수 
+
+            $('.list-group-item').click(function () {
+                targetChatId = this.dataset.id;
+                $('.chat-content').html('');
+
+                if (eventSource != undefined) {
+                    eventSource.close()
+                }
+
+                //프론트엔드에서 실시간 소통채널 여는법 
+                eventSource = new EventSource('/message/' + targetChatId);
+                eventSource.addEventListener('test', function (e) {
+                    let chatData = JSON.parse(e.data)
+                    chatData.forEach((i) => {
+                        $('.chat-content').append('<li><span class="chat-box">' + i.content + '</span></li>')
+                    });
+                });
+
+            });
+
             $('#send').click(function () {
                 let chatContent = $('#chat-input').val();
                 let data = {
@@ -66,13 +85,6 @@
                     console.log(a)
                 });
 
-            });
-
-            let targetChatId;
-
-            $('.list-group-item').click(function () {
-                $(this).css('background-color', '#eee');
-                targetChatId = $(this).attr('data-id');
             });
         </script>
 

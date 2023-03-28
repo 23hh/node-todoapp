@@ -295,7 +295,7 @@ app.post("/message", loginCheck, (req, res) => {
     });
 });
 
-app.post("/message", loginCheck, function (req, res) {
+app.post("/message", loginCheck, (req, res) => {
   var data = {
     parent: req.body.parent,
     userid: req.user._id,
@@ -308,4 +308,30 @@ app.post("/message", loginCheck, function (req, res) {
       console.log(parent);
       res.send(data);
     });
+});
+
+app.get("/message/:id", loginCheck, (req, res) => {
+  res.writeHead(200, {
+    Connection: "keep-alive",
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+  });
+
+  db.collection("message")
+    .find({ parent: req.params.parentid })
+    .toArray()
+    .then((data) => {
+      console.log(data);
+      res.write("event: test\n");
+      res.write(`data: ${JSON.stringify(data)}\n\n`);
+    });
+
+  const pipeline = [{ $match: { "fullDocument.parent": req.params.id } }];
+
+  const collection = db.collection("message");
+  const changeStream = collection.watch(pipeline);
+  changeStream.on("change", (result) => {
+    res.write("event: test\n");
+    res.write("data: " + JSON.stringify([result.fullDocument]) + "\n\n");
+  });
 });
